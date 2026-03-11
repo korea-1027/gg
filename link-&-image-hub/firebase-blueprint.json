@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "Link": {
+      "title": "Link",
+      "description": "A shortened URL mapping.",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "description": "The original destination URL." },
+        "shortId": { "type": "string", "description": "The 10-character unique identifier." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." },
+        "clicks": { "type": "number", "description": "Number of times the link was accessed." }
+      },
+      "required": ["url", "shortId", "createdAt"]
+    },
+    "ImageMetadata": {
+      "title": "Image Metadata",
+      "description": "Metadata for a shared image.",
+      "type": "object",
+      "properties": {
+        "shortId": { "type": "string", "description": "The 10-character unique identifier." },
+        "name": { "type": "string", "description": "Original filename." },
+        "mimeType": { "type": "string", "description": "MIME type of the image." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." },
+        "totalChunks": { "type": "number", "description": "Total number of chunks the image is split into." },
+        "size": { "type": "number", "description": "Total size in bytes." }
+      },
+      "required": ["shortId", "name", "mimeType", "createdAt", "totalChunks", "size"]
+    },
+    "ImageChunk": {
+      "title": "Image Chunk",
+      "description": "A piece of an image stored in Firestore.",
+      "type": "object",
+      "properties": {
+        "chunkIndex": { "type": "number", "description": "The index of this chunk (0-based)." },
+        "data": { "type": "string", "description": "Base64 encoded chunk data." }
+      },
+      "required": ["chunkIndex", "data"]
+    }
+  },
+  "firestore": {
+    "/links/{linkId}": {
+      "schema": "Link",
+      "description": "Collection of shortened links."
+    },
+    "/images/{imageId}": {
+      "schema": "ImageMetadata",
+      "description": "Collection of image metadata."
+    },
+    "/images/{imageId}/chunks/{chunkId}": {
+      "schema": "ImageChunk",
+      "description": "Subcollection containing image data chunks."
+    }
+  }
+}

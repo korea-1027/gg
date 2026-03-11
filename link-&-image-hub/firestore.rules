@@ -1,0 +1,67 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: links
+// Document ID: auto-generated
+// Fields:
+//   - url: string (required) - The original destination URL.
+//   - shortId: string (required, 10 chars) - Unique identifier.
+//   - createdAt: timestamp (required) - Creation time.
+//   - clicks: number (optional) - Click count.
+//
+// Collection: images
+// Document ID: auto-generated
+// Fields:
+//   - shortId: string (required, 10 chars) - Unique identifier.
+//   - name: string (required) - Filename.
+//   - mimeType: string (required) - MIME type.
+//   - createdAt: timestamp (required) - Creation time.
+//   - totalChunks: number (required) - Number of chunks.
+//   - size: number (required) - Total size in bytes.
+//
+// Collection: images/{imageId}/chunks
+// Document ID: auto-generated
+// Fields:
+//   - chunkIndex: number (required) - Index of the chunk.
+//   - data: string (required) - Base64 data.
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidShortId(id) {
+      return id is string && id.matches("^[a-zA-Z0-9]{10}$");
+    }
+
+    // Links Rules
+    match /links/{linkId} {
+      allow read: if true; // Publicly accessible for redirection
+      allow create: if true; // Allow anyone to create a link (or restrict to auth if preferred)
+      allow update: if false; // Only allow clicks increment if needed, but keeping it simple
+      allow delete: if false;
+    }
+
+    // Images Rules
+    match /images/{imageId} {
+      allow read: if true; // Publicly accessible for viewing
+      allow create: if true; 
+      allow update: if false;
+      allow delete: if false;
+
+      match /chunks/{chunkId} {
+        allow read: if true;
+        allow create: if true;
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+  }
+}
